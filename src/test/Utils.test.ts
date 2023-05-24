@@ -16,6 +16,17 @@ describe("Unit test suite", () => {
     // expect(result).toBe("ABC");
   });
 
+  describe("ToUpperCase examples", () => {
+    it.each([
+      { input: "abc", expected: "ABC" },
+      { input: "My-String", expected: "MY-STRING" },
+      { input: "def", expected: "DEF" },
+    ])("$input toUpperCase should be $expected", ({ input, expected }) => {
+      const actual = toUpperCase(input);
+      expect(actual).toBe(expected);
+    });
+  });
+
   describe("getStringInfo for ary My-String should", () => {
     test("return right length", () => {
       const actual = getStringInfo("My-String");
