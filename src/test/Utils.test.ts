@@ -18,6 +18,32 @@ describe("Unit test suite", () => {
 
       expect(actual).toBe("ABC");
     });
+
+    it("Should throw error on invalid argument - function", () => {
+      function expectError() {
+        const actual = sut.toUppperCase("");
+      }
+
+      expect(expectError).toThrow();
+      expect(expectError).toThrowError("Invalid argument!");
+    });
+
+    it("Should throw error on invalid argument - arrow function", () => {
+      expect(() => {
+        sut.toUppperCase("");
+      }).toThrowError("Invalid argument!");
+    });
+
+    it("Should throw error on invalid argument - try catch arrow function", (done) => {
+      try {
+        sut.toUppperCase("");
+        done("GetStringInfo should throw error for invalid arg!");
+      } catch (error) {
+        expect(error).toBeInstanceOf(Error);
+        expect(error).toHaveProperty("message", "Invalid argument!");
+        done();
+      }
+    });
   });
 
   it("should return uppercase of valid string", () => {
