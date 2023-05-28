@@ -19,6 +19,14 @@ describe("Unit test suite", () => {
       expect(actual).toBe("ABC");
     });
 
+    it.todo("test for todo");
+    it.skip("test for skip1", () => {
+      console.log("test for skip1");
+    });
+    xit("test for skip2", () => {
+      console.log("test for skip2");
+    });
+
     it("Should throw error on invalid argument - function", () => {
       function expectError() {
         const actual = sut.toUppperCase("");
