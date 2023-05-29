@@ -13,7 +13,7 @@ describe("Unit test suite", () => {
       console.log("Teardown");
     });
 
-    it("Should return correct uppercase", () => {
+    it.only("Should return correct uppercase", () => {
       const actual = sut.toUppperCase("abc");
 
       expect(actual).toBe("ABC");
