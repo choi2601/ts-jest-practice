@@ -42,4 +42,10 @@ describe("PasswordChecker test suite", () => {
     const actual = sut.checkPassword("1234abcdA");
     expect(actual.reasons).not.toContain(PasswordErrors.NO_LOWER_CASE);
   });
+
+  it("Complex password is valid", () => {
+    const actual = sut.checkPassword("1234abcD");
+    expect(actual.reasons).toHaveLength(0);
+    expect(actual.valid).toBe(true);
+  });
 });
