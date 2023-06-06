@@ -23,3 +23,20 @@ export function toUpperCaseWithCallback(
   callback(`called function with ${arg}`);
   return arg.toUpperCase();
 }
+
+export class OtherStringUtils {
+  //   private callExternalService() {
+  //     console.log("Calling external service");
+  //   }
+  public callExternalService() {
+    console.log("Called external service");
+  }
+
+  public toUpperCase(arg: string) {
+    return arg.toUpperCase();
+  }
+
+  public logString(arg: string) {
+    console.log(arg);
+  }
+}
