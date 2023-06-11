@@ -75,7 +75,7 @@ describe("RegisterHandler test suite", () => {
 
     expect(responseMock.statusCode).toBe(HTTP_CODES.BAD_REQUEST);
     expect(responseMock.writeHead).toBeCalledWith(HTTP_CODES.BAD_REQUEST, {
-      "Content-type": "application/json",
+      "Content-Type": "application/json",
     });
     expect(responseMock.write).toBeCalledWith(
       JSON.stringify("userName and password required")

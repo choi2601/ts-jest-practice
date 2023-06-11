@@ -68,7 +68,7 @@ describe("ReservationsDataAccess test suite", () => {
     const actual = await sut.getReservation(someId);
 
     expect(actual).toEqual(someReservation);
-    expect(actual).toBeCalledWith("id", someId);
+    expect(mockGetBy).toBeCalledWith("id", someId);
   });
 
   it("should return all reservations", async () => {
