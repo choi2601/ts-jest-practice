@@ -112,4 +112,53 @@ describe("ReservationsHandler test suite", () => {
       );
     });
   });
+
+  describe("GET requests", () => {
+    beforeEach(() => {
+      request.method = HTTP_METHODS.GET;
+    });
+
+    it("should return all reservatios for all request", async () => {
+      request.url = "/reservations/all";
+      reservationsDataAccessMock.getAllReservations.mockResolvedValueOnce([
+        someReservation,
+      ]);
+
+      await sut.handleRequest();
+
+      expect(responseMock.writeHead).toBeCalledWith(HTTP_CODES.OK, {
+        "Content-Type": "application/json",
+      });
+      expect(responseMock.write).toBeCalledWith(
+        JSON.stringify([someReservation])
+      );
+    });
+
+    it("should return reservation for existing id", async () => {
+      request.url = `/reservations/${someReservationId}`;
+      reservationsDataAccessMock.getReservation.mockRejectedValueOnce(
+        someReservation
+      );
+
+      await sut.handleRequest();
+
+      expect(responseMock.writeHead).toBeCalledWith(HTTP_CODES.OK, {
+        "Content-Type": "application/json",
+      });
+      expect(responseMock.write).toBeCalledWith(
+        JSON.stringify(someReservation)
+      );
+    });
+
+    it("should return bad request if no id provided", async () => {
+      request.url = "/reservations";
+
+      await sut.handleRequest();
+
+      expect(responseMock.statusCode).toBe(HTTP_CODES.BAD_REQUEST);
+      expect(responseMock.write).toBeCalledWith(
+        JSON.stringify("Please provide an ID!")
+      );
+    });
+  });
 });
