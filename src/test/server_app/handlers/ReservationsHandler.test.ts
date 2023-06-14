@@ -161,4 +161,105 @@ describe("ReservationsHandler test suite", () => {
       );
     });
   });
+
+  describe("PUT requests", () => {
+    beforeEach(() => {
+      request.method = HTTP_METHODS.PUT;
+    });
+
+    it("should return not found for non existing id", async () => {
+      request.url = `/reservations/${someReservationId}`;
+      reservationsDataAccessMock.getReservation.mockResolvedValueOnce(
+        undefined
+      );
+
+      await sut.handleRequest();
+
+      expect(responseMock.statusCode).toBe(HTTP_CODES.NOT_fOUND);
+      expect(responseMock.write).toBeCalledWith(
+        JSON.stringify(`Reservation with id ${someReservationId} not found`)
+      );
+    });
+
+    it("should return bad request if no id provided", async () => {
+      request.url = `/reservations`;
+
+      await sut.handleRequest();
+
+      expect(responseMock.statusCode).toBe(HTTP_CODES.BAD_REQUEST);
+      expect(responseMock.write).toBeCalledWith(
+        JSON.stringify("Please provide an ID!")
+      );
+    });
+
+    it("should return bad request if invalid fields are provided", async () => {
+      request.url = `/reservations/${someReservationId}`;
+      reservationsDataAccessMock.getReservation.mockResolvedValueOnce(
+        someReservation
+      );
+      getRequestBodyMock.mockResolvedValueOnce({
+        startDate1: "someDate",
+      });
+
+      await sut.handleRequest();
+
+      expect(responseMock.statusCode).toBe(HTTP_CODES.BAD_REQUEST);
+      expect(responseMock.write).toBeCalledWith(
+        JSON.stringify("Please provide valid fields to update!")
+      );
+    });
+
+    it("should return bad request if no fileds are provided", async () => {
+      request.url = `/reservations/${someReservationId}`;
+      reservationsDataAccessMock.getReservation.mockRejectedValueOnce(
+        someReservation
+      );
+      getRequestBodyMock.mockResolvedValueOnce({});
+
+      await sut.handleRequest();
+
+      expect(responseMock.statusCode).toBe(HTTP_CODES.BAD_REQUEST);
+      expect(responseMock.write).toBeCalledWith(
+        JSON.stringify("Please provide valid fields to update!")
+      );
+    });
+
+    it("should update reservation with all valid fileds provided", async () => {
+      request.url = `/reservations/${someReservationId}`;
+      reservationsDataAccessMock.getReservation.mockResolvedValueOnce(
+        someReservation
+      );
+
+      const updateObject = {
+        startDate: "someDate1",
+        endDate: "someDate2",
+      };
+
+      getRequestBodyMock.mockResolvedValueOnce(updateObject);
+
+      await sut.handleRequest();
+
+      expect(reservationsDataAccessMock.updateReservation).toBeCalledTimes(2);
+      expect(reservationsDataAccessMock.updateReservation).toBeCalledWith(
+        someReservationId,
+        "startDate",
+        updateObject.startDate
+      );
+      expect(reservationsDataAccessMock.updateReservation).toBeCalledWith(
+        someReservationId,
+        "endDate",
+        updateObject.endDate
+      );
+      expect(responseMock.writeHead).toBeCalledWith(HTTP_CODES.OK, {
+        "Content-Type": "application/json",
+      });
+      expect(responseMock.write).toBeCalledWith(
+        JSON.stringify(
+          `Updated ${Object.keys(
+            updateObject
+          )} of reservation ${someReservationId}`
+        )
+      );
+    });
+  });
 });
