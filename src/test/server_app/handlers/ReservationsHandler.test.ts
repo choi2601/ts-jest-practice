@@ -262,4 +262,68 @@ describe("ReservationsHandler test suite", () => {
       );
     });
   });
+
+  describe("DELETE requests", () => {
+    beforeEach(() => {
+      request.method = HTTP_METHODS.DELETE;
+    });
+
+    it("should delete reservation with provided id", async () => {
+      request.url = `/reservations/${someReservationId}`;
+
+      await sut.handleRequest();
+
+      expect(reservationsDataAccessMock.deleteReservation).toBeCalledWith(
+        someReservationId
+      );
+      expect(responseMock.statusCode).toBe(HTTP_CODES.OK);
+      expect(responseMock.write).toBeCalledWith(
+        JSON.stringify(`Deleted reservation with id ${someReservationId}`)
+      );
+    });
+
+    it("should return bad request if no id provided", async () => {
+      request.url = "/reservations";
+
+      await sut.handleRequest();
+
+      expect(responseMock.statusCode).toBe(HTTP_CODES.BAD_REQUEST);
+      expect(responseMock.write).toBeCalledWith(
+        JSON.stringify("Please provide ID!")
+      );
+    });
+
+    it("should return nothing for not authorized requests", async () => {
+      request.headers.authorization = "1234";
+      authorizerMock.validateToken.mockReset();
+      authorizerMock.validateToken.mockResolvedValueOnce(false);
+
+      await sut.handleRequest();
+
+      expect(responseMock.statusCode).toBe(HTTP_CODES.UNAUTHORIZED);
+      expect(responseMock.write).toBeCalledWith(
+        JSON.stringify("Unauthorized operation!")
+      );
+    });
+
+    it("should return nothing if no authorization header is present", async () => {
+      request.headers.authorization = undefined;
+
+      await sut.handleRequest();
+
+      expect(responseMock.statusCode).toBe(HTTP_CODES.UNAUTHORIZED);
+      expect(responseMock.write).toBeCalledWith(
+        JSON.stringify("Unauthorized operation!")
+      );
+    });
+
+    it("should do nothing for not supported http methods", async () => {
+      request.method = "SOME-METHOD";
+
+      await sut.handleRequest();
+
+      expect(responseMock.write).not.toBeCalled();
+      expect(responseMock.writeHead).not.toBeCalled();
+    });
+  });
 });
