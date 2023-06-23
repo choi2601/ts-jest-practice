@@ -105,6 +105,7 @@ describe("Login requests", () => {
 
     await new Server().startServer();
 
+    // https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick
     await new Promise(process.nextTick);
 
     expect(responseWrapper.statusCode).toBeUndefined();
