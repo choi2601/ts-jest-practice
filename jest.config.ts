@@ -1,7 +1,8 @@
 import type { Config } from "@jest/types";
 
-const baseDir = "<rootDir>/src/app/server_app2";
-const baseTestDir = "<rootDir>/src/test/server_app2";
+const baseDir = "<rootDir>/src/app/server_app2/ReservationRequests.test.ts";
+const baseTestDir =
+  "<rootDir>/src/test/server_app2/ReservationRequests.test.st";
 
 const config: Config.InitialOptions = {
   preset: "ts-jest",
