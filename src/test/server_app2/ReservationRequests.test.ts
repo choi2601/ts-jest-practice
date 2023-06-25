@@ -59,4 +59,35 @@ describe("Reservation requests", () => {
     responseWrapper.clearFields();
     jest.clearAllMocks();
   });
+
+  describe("POST requests", () => {
+    it("should create reservation from valid requests", async () => {
+      requestWrapper.method = HTTP_METHODS.POST;
+      requestWrapper.body = someReservation;
+      requestWrapper.url = "localhost:8080/reservation";
+
+      await new Server().startServer();
+
+      await new Promise(process.nextTick);
+
+      expect(responseWrapper.statusCode).toBe(HTTP_CODES.CREATED);
+      expect(responseWrapper.body).toEqual({
+        reservationId: someId,
+      });
+      expect(responseWrapper.headers).toContainEqual(jsonHeader);
+    });
+
+    it("should not create reservation from invalid request", async () => {
+      requestWrapper.method = HTTP_METHODS.POST;
+      requestWrapper.body = {};
+      requestWrapper.url = "localhost:8080/reservation";
+
+      await new Server().startServer();
+
+      await new Promise(process.nextTick);
+
+      expect(responseWrapper.statusCode).toBe(HTTP_CODES.BAD_REQUEST);
+      expect(responseWrapper.body).toEqual("Incomplete reservation!");
+    });
+  });
 });
