@@ -264,4 +264,19 @@ describe("Reservation requests", () => {
     expect(responseWrapper.headers).toHaveLength(0);
     expect(responseWrapper.body).toBeUndefined();
   });
+
+  it("should return not authorized if request is not authorized", async () => {
+    requestWrapper.method = HTTP_METHODS.POST;
+    requestWrapper.body = {};
+    requestWrapper.url = "localhost:8080/reservation";
+    getBySpy.mockReset();
+    getBySpy.mockResolvedValueOnce(undefined);
+
+    await new Server().startServer();
+
+    await new Promise(process.nextTick);
+
+    expect(responseWrapper.statusCode).toBe(HTTP_CODES.UNAUTHORIZED);
+    expect(responseWrapper.body).toEqual("Unauthorized operation!");
+  });
 });
