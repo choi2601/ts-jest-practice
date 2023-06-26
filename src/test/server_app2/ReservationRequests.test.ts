@@ -221,4 +221,33 @@ describe("Reservation requests", () => {
     expect(responseWrapper.statusCode).toBe(HTTP_CODES.BAD_REQUEST);
     expect(responseWrapper.body).toEqual(`Please provide an ID!`);
   });
+
+  describe("DELETE requests", () => {
+    it("should delete specific reservations", async () => {
+      requestWrapper.method = HTTP_METHODS.DELETE;
+      requestWrapper.url = `localhost:8080/reservation/${someId}`;
+      deleteSpy.mockResolvedValueOnce(undefined);
+
+      await new Server().startServer();
+
+      await new Promise(process.nextTick);
+
+      expect(responseWrapper.statusCode).toBe(HTTP_CODES.OK);
+      expect(responseWrapper.body).toEqual(
+        `Deleted reservation with id ${someId}`
+      );
+    });
+
+    it("should return bad request if no reservation id is provied", async () => {
+      requestWrapper.method = HTTP_METHODS.DELETE;
+      requestWrapper.url = `localhost:8080/reservation`;
+
+      await new Server().startServer();
+
+      await new Promise(process.nextTick);
+
+      expect(responseWrapper.statusCode).toBe(HTTP_CODES.BAD_REQUEST);
+      expect(responseWrapper.body).toEqual(`Please provide an ID!`);
+    });
+  });
 });
