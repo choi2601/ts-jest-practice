@@ -90,4 +90,64 @@ describe("Reservation requests", () => {
       expect(responseWrapper.body).toEqual("Incomplete reservation!");
     });
   });
+
+  describe("GET requests", () => {
+    it("should return all reservations", async () => {
+      requestWrapper.method = HTTP_METHODS.GET;
+      requestWrapper.url = "localhost:8080/reservation/all";
+      getAllElementsSpy.mockResolvedValueOnce([
+        someReservation,
+        someReservation,
+      ]);
+
+      await new Server().startServer();
+
+      await new Promise(process.nextTick);
+
+      expect(responseWrapper.statusCode).toBe(HTTP_CODES.OK);
+      expect(responseWrapper.body).toEqual([someReservation, someReservation]);
+      expect(responseWrapper.headers).toContainEqual(jsonHeader);
+    });
+
+    it("should return specific reservations", async () => {
+      requestWrapper.method = HTTP_METHODS.GET;
+      requestWrapper.url = `localhost:8080/reservation/${someId}`;
+      getBySpy.mockResolvedValueOnce(someReservation);
+
+      await new Server().startServer();
+
+      await new Promise(process.nextTick);
+
+      expect(responseWrapper.statusCode).toBe(HTTP_CODES.OK);
+      expect(responseWrapper.body).toEqual(someReservation);
+      expect(responseWrapper.headers).toContainEqual(jsonHeader);
+    });
+
+    it("should return not found if reservation is not found", async () => {
+      requestWrapper.method = HTTP_METHODS.GET;
+      requestWrapper.url = `localhost:8080/reservation/${someId}`;
+      getBySpy.mockResolvedValueOnce(undefined);
+
+      await new Server().startServer();
+
+      await new Promise(process.nextTick);
+
+      expect(responseWrapper.statusCode).toBe(HTTP_CODES.NOT_fOUND);
+      expect(responseWrapper.body).toEqual(
+        `Reservation with id ${someId} not found`
+      );
+    });
+
+    it("should return bad requests if reservation is not provided", async () => {
+      requestWrapper.method = HTTP_METHODS.GET;
+      requestWrapper.url = `localhost:8080/reservation`;
+
+      await new Server().startServer();
+
+      await new Promise(process.nextTick);
+
+      expect(responseWrapper.statusCode).toBe(HTTP_CODES.BAD_REQUEST);
+      expect(responseWrapper.body).toEqual("Please provide an ID!");
+    });
+  });
 });
