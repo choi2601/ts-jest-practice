@@ -250,4 +250,18 @@ describe("Reservation requests", () => {
       expect(responseWrapper.body).toEqual(`Please provide an ID!`);
     });
   });
+
+  it("should do nothing for not supported methods", async () => {
+    requestWrapper.method = HTTP_METHODS.OPTIONS;
+    requestWrapper.body = {};
+    requestWrapper.url = "localhost:8080/reservation";
+
+    await new Server().startServer();
+
+    await new Promise(process.nextTick);
+
+    expect(responseWrapper.statusCode).toBeUndefined();
+    expect(responseWrapper.headers).toHaveLength(0);
+    expect(responseWrapper.body).toBeUndefined();
+  });
 });
