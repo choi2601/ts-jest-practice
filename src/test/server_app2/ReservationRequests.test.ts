@@ -150,4 +150,75 @@ describe("Reservation requests", () => {
       expect(responseWrapper.body).toEqual("Please provide an ID!");
     });
   });
+
+  describe("PUT requests", () => {
+    it("should update reservation if found and valid request", async () => {
+      requestWrapper.method = HTTP_METHODS.PUT;
+      requestWrapper.url = `localhost:8080/reservation/${someId}`;
+      getBySpy.mockResolvedValueOnce(someReservation);
+      updateSpy.mockResolvedValue(undefined);
+      requestWrapper.body = {
+        user: "someOtherUser",
+        startDate: "someOtherStartDate",
+      };
+
+      await new Server().startServer();
+
+      await new Promise(process.nextTick);
+
+      expect(responseWrapper.statusCode).toBe(HTTP_CODES.OK);
+      expect(responseWrapper.body).toEqual(
+        `Updated user, startDate of reservation ${someId}`
+      );
+      expect(responseWrapper.headers).toContainEqual(jsonHeader);
+    });
+  });
+
+  it("should not update reservation if invalid fields are provided", async () => {
+    requestWrapper.method = HTTP_METHODS.PUT;
+    requestWrapper.url = `localhost:8080/reservation/${someId}`;
+    getBySpy.mockResolvedValueOnce(someReservation);
+    updateSpy.mockResolvedValue(undefined);
+    requestWrapper.body = {
+      user: "someOtherUser",
+      startDate: "someOtherStartDate",
+      someOtherField: "someOtherField",
+    };
+
+    await new Server().startServer();
+
+    await new Promise(process.nextTick);
+
+    expect(responseWrapper.statusCode).toBe(HTTP_CODES.BAD_REQUEST);
+    expect(responseWrapper.body).toEqual(
+      `Please provide valid fields to update!`
+    );
+  });
+
+  it("should not update reservation if it it not found", async () => {
+    requestWrapper.method = HTTP_METHODS.PUT;
+    requestWrapper.url = `localhost:8080/reservation/${someId}`;
+    getBySpy.mockResolvedValueOnce(undefined);
+
+    await new Server().startServer();
+
+    await new Promise(process.nextTick);
+
+    expect(responseWrapper.statusCode).toBe(HTTP_CODES.NOT_fOUND);
+    expect(responseWrapper.body).toEqual(
+      `Reservation with id ${someId} not found`
+    );
+  });
+
+  it("should return bad request if no reservation id is provided", async () => {
+    requestWrapper.method = HTTP_METHODS.PUT;
+    requestWrapper.url = `localhost:8080/reservation`;
+
+    await new Server().startServer();
+
+    await new Promise(process.nextTick);
+
+    expect(responseWrapper.statusCode).toBe(HTTP_CODES.BAD_REQUEST);
+    expect(responseWrapper.body).toEqual(`Please provide an ID!`);
+  });
 });
