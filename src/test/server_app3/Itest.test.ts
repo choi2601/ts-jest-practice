@@ -171,4 +171,33 @@ describe("Server app integration tests", () => {
     const getRequestBody: Reservation = await getResult.json();
     expect(getRequestBody.startDate).toBe("ohterStartDate");
   });
+
+  it("should delete reservation if authorized", async () => {
+    const deleteResult = await fetch(
+      `https://localhost:8080/reservation/${createdReservationId}`,
+      {
+        method: HTTP_METHODS.DELETE,
+        headers: {
+          authorization: token,
+        },
+      }
+    );
+
+    expect(deleteResult.status).toBe(HTTP_CODES.OK);
+
+    const getResult = await fetch(
+      `localhost:8080/reservation/${createdReservationId}`,
+      {
+        method: HTTP_METHODS.PUT,
+        body: JSON.stringify({
+          startDate: "otherStartDate",
+        }),
+        headers: {
+          authorization: token,
+        },
+      }
+    );
+
+    expect(getResult.status).toBe(HTTP_CODES.NOT_fOUND);
+  });
 });
