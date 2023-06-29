@@ -138,4 +138,37 @@ describe("Server app integration tests", () => {
     expect(getAllResult.status).toBe(HTTP_CODES.OK);
     expect(resultBody).toHaveLength(0);
   });
+
+  it("should update reservation if authorized", async () => {
+    const updateResult = await fetch(
+      `localhost:8080/reservation/${createdReservationId}`,
+      {
+        method: HTTP_METHODS.PUT,
+        body: JSON.stringify({
+          startDate: "otherStartDate",
+        }),
+        headers: {
+          authorization: token,
+        },
+      }
+    );
+
+    expect(updateResult.status).toBe(HTTP_CODES.OK);
+
+    const getResult = await fetch(
+      `localhost:8080/reservation/${createdReservationId}`,
+      {
+        method: HTTP_METHODS.PUT,
+        body: JSON.stringify({
+          startDate: "otherStartDate",
+        }),
+        headers: {
+          authorization: token,
+        },
+      }
+    );
+
+    const getRequestBody: Reservation = await getResult.json();
+    expect(getRequestBody.startDate).toBe("ohterStartDate");
+  });
 });
